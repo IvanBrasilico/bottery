@@ -5,7 +5,7 @@ import requests
 
 from bottery import platform
 from bottery.message import Message
-from bottery.platform import discover_view
+from bottery.platform import discover_view, discover_and_run_view
 from bottery.user import User
 
 logger = logging.getLogger('bottery.telegram')
@@ -135,11 +135,9 @@ class TelegramEngine(platform.BasePlatform):
         message = self.build_message(data)
 
         # Try to find a view (best name?) to response the message
-        view = discover_view(message)
-        if not view:
+        response = discover_and_run_view(message)
+        if not response:
             return
-
-        response = view(message)
 
         # TODO: Choose between Markdown and HTML
         data = {
