@@ -1,3 +1,4 @@
+from unittest import mock
 from bottery.views import pong, locate_next, \
     process_parameters, access_api_rules
 
@@ -9,10 +10,10 @@ def test_pong():
 
 
 rules = {'book': {'list': '/list',
-                 'show': '/show/',
-                 'filter': '/filter',
-                 '_message': 'Enter command: '
-                }
+                  'view': '/view/',
+                  'filter': '/filter',
+                  '_message': 'Enter command: '
+                 }
         }
 params = {'filter:2': [{'name': 'author', 'required': True},
                        {'name': 'name', 'required': True},
@@ -28,6 +29,15 @@ def test_locate_next():
 def test_process_parameters():
     assert process_parameters('filter', 2, params) == (['author', 'name', 'publisher'], 2)
 
-def test_access_api_rules():
-    pass
-    
+@mock.patch('bottery.views.urlopen')
+def test_call_api(urlopen):
+    urlopen.return_value.read.return_value = '{"mocked": "mocked"}'
+    message = type('Message', (object,), {'text': 'book'})
+    resp, hook = access_api_rules(message, rules)
+    assert hook is True
+    assert resp.find('Enter command:') == 0
+    message.text = 'book view'
+    assert access_api_rules(message, rules) == ('Enter parameters: ', True)
+    message.text = 'book view corcunda'
+    assert access_api_rules(message, rules) == ('mocked: mocked \n ', False)
+

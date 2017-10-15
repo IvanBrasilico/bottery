@@ -1,6 +1,7 @@
-import sys
 import json
-import urllib.request
+import sys
+import shlex
+from urllib.request import urlopen
 
 
 def pong(message):
@@ -10,12 +11,13 @@ def locate_next(words, rules, level=1):
     '''Recursively process the rule chain
     Used by view access_api_rules'''
     try:
-        lista = words.split(' ')
+        # alist = words.split(' ') (like in shell, preserves expressions in quotes)
+        alist = shlex.split(words)
         next_level = {}
         url = ""
         for key, value in rules.items():
-            if key == lista[0]:
-                # print('key found =', lista[0])
+            if key == alist[0]:
+                # print('key found =', alist[0])
                 if isinstance(value, dict):
                     for k, v in value.items():
                         next_level[k] = v
@@ -25,8 +27,8 @@ def locate_next(words, rules, level=1):
         if url:
             return url, level
         else:
-            if len(lista) > 1:
-                return locate_next(' '.join(lista[1:]), next_level, level+1)
+            if len(alist) > 1:
+                return locate_next(' '.join(alist[1:]), next_level, level+1)
             return next_level, level
     except AttributeError:
         print("Atribute error. Possibly misconfiguration of rules:", sys.exc_info()[0])
@@ -46,10 +48,10 @@ def process_parameters(name, level, params):
     n_required = 0
     for param in param_list:
         result.append(param['name'])
-        if param['required'] == True:
-            n_required+=1
-            
-    return result, n_required    
+        if param['required'] is True:
+            n_required += 1
+
+    return result, n_required
 
 def access_api_rules(message, rules, params_dict=None):
     '''Acess a JSON 'REST' API maped by rules
@@ -66,7 +68,8 @@ def access_api_rules(message, rules, params_dict=None):
              }
     '''
     text = message.text
-    alist = text.split(' ')
+    # Splits like in shell: splits/tokenizes on spaces, preserving expressions between quotes
+    alist = shlex.split(text)
     url, level = locate_next(text, rules)
     if isinstance(url, dict):
         if url == {}:
@@ -89,14 +92,17 @@ def access_api_rules(message, rules, params_dict=None):
         str_params = '?'
         cont = 0
         for param in alist[level:]:
-            str_params =  str_params + params_list[cont] + '=' + \
-                          param + '&'
+            str_params = str_params + params_list[cont] + '=' + \
+                         param + '&'
             cont += 1
         str_params = str_params[:-1] # Take off last '&'
-        
+
     url = url + str_params
-    response_text = urllib.request.urlopen(url).read()
-    resposta = response_text.decode('utf-8')
+    response_text = urlopen(url).read()
+    try:
+        resposta = response_text.decode('utf-8')
+    except AttributeError:
+        resposta = response_text
     json_resposta = json.loads(resposta)
     str_resposta = ""
     print(json_resposta)
@@ -107,5 +113,5 @@ def access_api_rules(message, rules, params_dict=None):
     else:
         for key, value in json_resposta.items():
             str_resposta = str_resposta + key + ': ' + str(value) + ' \n '
-        
+
     return str_resposta, False
