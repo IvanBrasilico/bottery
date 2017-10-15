@@ -63,7 +63,7 @@ class HookableFuncPattern(Pattern):
             tuple_return = self.view(message)
         else:
             tuple_return = self.view(message, self.rules, self.params)
-        if type(tuple_return) is tuple:
+        if isinstance(tuple_return, tuple):
             response = tuple_return[0]
             hook = tuple_return[1]
         else:
@@ -87,11 +87,10 @@ class HookableFuncPattern(Pattern):
         While view returns True, the hook will remain'''
         # If hooked, go directly to view
         if (not self.conversation is None) and self.conversation.has_hook():
-            print("After first pass")
             if self.save_context:
                 self.context.append(message.text)
                 message.text = " ".join(self.context)
-            response, hook = self.safe_call_view(message)    
+            response, hook = self.safe_call_view(message)
             if not hook:
                 self.conversation.end_hook()
                 self.context = []
@@ -99,7 +98,7 @@ class HookableFuncPattern(Pattern):
         # Else, begin normal check
         text, _ = self.pre_process(message.text)
         if text == self.pattern:
-            response, hook = self.safe_call_view(message)    
+            response, hook = self.safe_call_view(message)
             if hook:
                 try:
                     self.context = []
@@ -110,7 +109,7 @@ class HookableFuncPattern(Pattern):
                     print(err)
             return response
         return False
- 
+
 
 class HookPattern(Pattern):
     '''FirstPattern to be checked. Allows a Pattern to "capture" and release
@@ -156,4 +155,3 @@ class HookPattern(Pattern):
         if self._pattern is None:
             return "Error: no pattern hooked"
         return self._pattern.call_view(message)
-
