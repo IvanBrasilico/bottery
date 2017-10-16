@@ -49,6 +49,7 @@ def test_default_pattern_check_message():
     result = pattern.check(message)
     assert result == view
 
+
 def test_hook_pattern_no_hook():
     '''Check basic fields and False return if no hook
     active'''
@@ -61,7 +62,7 @@ def test_hook_pattern_no_hook():
 
 def test_hook_pattern_check_right_message():
     '''
-    Check if Hook forwards to Pattern class 
+    Check if Hook forwards to Pattern class
     return the view when message checks with
     pattern.
     '''
@@ -83,13 +84,18 @@ def test_hook_pattern_check_right_message():
 
 
 def test_hookable_func_pattern_instance():
-    def view(): return 'Hello world'
-    def pre_process(): return 'ping'
+
+    def view():
+        return 'Hello world'
+
+    def pre_process():
+        return 'ping'
+
     hook_pattern = HookPattern()
     rules = {}
     params = {}
     pattern = HookableFuncPattern('ping', view, pre_process,
-        hook_pattern, rules=rules, params=params)
+                                  hook_pattern, rules=rules, params=params)
     assert pattern.pattern == 'ping'
     assert pattern.view == view
     assert pattern.pre_process == pre_process
@@ -99,57 +105,81 @@ def test_hookable_func_pattern_instance():
     assert pattern.rules == rules
     assert pattern.params == params
 
+
 def test_hookable_func_pattern_right_message():
-    def view(): return 'Hello world'
-    def pre_process(text): return text, 'params'
+
+    def view():
+        return 'Hello world'
+
+    def pre_process(text):
+        return text, 'params'
+
     hook_pattern = HookPattern()
     rules = {}
     params = {}
     pattern = HookableFuncPattern('ping', view, pre_process,
-        hook_pattern, rules=rules, params=params)
+                                  hook_pattern, rules=rules, params=params)
     message = type('Message', (object,), {'text': 'ping'})
     assert pattern.check(message) is True
 
+
 def test_hookable_func_pattern_wrong_message_and_hook():
-    def view(): return 'Hello world'
-    def pre_process(text): return text, 'params'
+
+    def view():
+        return 'Hello world'
+
+    def pre_process(text):
+        return text, 'params'
+
     hook_pattern = HookPattern()
     rules = {}
     params = {}
     pattern = HookableFuncPattern('ping', view, pre_process,
-        hook_pattern, rules=rules, params=params)
+                                  hook_pattern, rules=rules, params=params)
     message = type('Message', (object,), {'text': 'wrong'})
     assert pattern.check(message) is False
     # Now, activate Hook and test again
     hook_pattern.begin_hook(pattern)
     assert pattern.check(message) is True
 
+
 def test_hookable_func_pattern_safe_call_view():
-    def view(message): return message.text
-    def pre_process(text): return text, 'params'
+
+    def view(message):
+        return message.text
+
+    def pre_process(text):
+        return text, 'params'
+
     hook_pattern = HookPattern()
     rules = {}
     params = {}
     pattern = HookableFuncPattern('ping', view, pre_process,
-        hook_pattern, rules=rules, params=params)
+                                  hook_pattern, rules=rules, params=params)
     message = type('Message', (object,), {'text': 'one_value'})
     text, hook = pattern.safe_call_view(message)
     assert text == message.text
     assert hook is False
 
+
 def test_hookable_func_pattern_call_view():
+    '''HookableFuncPattern.callview Test'''
+
+    def view(message):
+        return view_result_list[ind]
+
+    def pre_process(text):
+        return text, 'params'
+
     view_result_list = [('one', True),
                         ('two', True),
                         ('end', False)]
     ind = 0
-    def view(message): 
-        return view_result_list[ind]
-    def pre_process(text): return text, 'params'
     hook_pattern = HookPattern()
     rules = {}
     params = {}
     pattern = HookableFuncPattern('ping', view, pre_process,
-        hook_pattern, rules=rules, params=params)
+                                  hook_pattern, rules=rules, params=params)
     right_message = type('Message', (object,), {'text': 'ping'})
     wrong_message = type('Message', (object,), {'text': 'wrong'})
     assert pattern.check(wrong_message) is False
@@ -170,4 +200,3 @@ def test_hookable_func_pattern_call_view():
     text = pattern.call_view(wrong_message)
     assert text == view_result_list[ind][0]
     assert hook_pattern.check(right_message) is False
-

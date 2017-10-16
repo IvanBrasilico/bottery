@@ -7,11 +7,13 @@ from urllib.request import urlopen
 def pong(message):
     return 'pong'
 
+
 def locate_next(words, rules, level=1):
     '''Recursively process the rule chain
     Used by view access_api_rules'''
     try:
-        # alist = words.split(' ') (like in shell, preserves expressions in quotes)
+        # alist = words.split(' ')
+        # (like in shell, preserves expressions in quotes)
         alist = shlex.split(words)
         next_level = {}
         url = ""
@@ -28,14 +30,17 @@ def locate_next(words, rules, level=1):
             return url, level
         else:
             if len(alist) > 1:
-                return locate_next(' '.join(alist[1:]), next_level, level+1)
+                return locate_next(' '.join(alist[1:]),
+                                   next_level, level+1)
             return next_level, level
     except AttributeError:
-        print("Atribute error. Possibly misconfiguration of rules:", sys.exc_info()[0])
+        print("Atribute error. Possibly misconfiguration of rules:",
+              sys.exc_info()[0])
         raise
     except:
         print("Unexpected error:", sys.exc_info()[0])
         raise
+
 
 def process_parameters(name, level, params):
     '''Process the parameter chain
@@ -53,6 +58,7 @@ def process_parameters(name, level, params):
 
     return result, n_required
 
+
 def access_api_rules(message, rules, params_dict=None):
     '''Acess a JSON 'REST' API maped by rules
     text: a phrase, a sequence of words by space passed by the Pattern object
@@ -68,7 +74,8 @@ def access_api_rules(message, rules, params_dict=None):
              }
     '''
     text = message.text
-    # Splits like in shell: splits/tokenizes on spaces, preserving expressions between quotes
+    # Splits like in shell: splits/tokenizes on spaces,
+    # preserving expressions between quotes
     alist = shlex.split(text)
     url, level = locate_next(text, rules)
     if isinstance(url, dict):
@@ -83,11 +90,13 @@ def access_api_rules(message, rules, params_dict=None):
             return 'Enter parameters: ', True
     else:
         n_params_passed = len(alist) - level
-        params_list, n_required = process_parameters(alist[level-1], level,params_dict)
+        params_list, n_required = process_parameters(alist[level-1],
+                                                     level, params_dict)
         if n_params_passed < n_required:
             return 'Required parameters: ' + str(n_required) + \
                    ' Order: ' + ' '.join(params_list) + \
-                   ' Number of parameters passed: ' + str(n_params_passed), True
+                   ' Number of parameters passed: ' + \
+                   str(n_params_passed), True
         # else n_params_passed >= n_required
         str_params = '?'
         cont = 0
@@ -95,7 +104,7 @@ def access_api_rules(message, rules, params_dict=None):
             str_params = str_params + params_list[cont] + '=' + \
                          param + '&'
             cont += 1
-        str_params = str_params[:-1] # Take off last '&'
+        str_params = str_params[:-1]  # Take off last '&'
 
     url = url + str_params
     response_text = urlopen(url).read()

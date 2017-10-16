@@ -1,13 +1,15 @@
 '''Configuration of the routes, or vocabulary of the bot'''
 from bottery.conf.patterns import Pattern, DefaultPattern, \
-    HookableFuncPattern, HookPattern, FuncPattern
+    HookableFuncPattern, HookPattern
 from bottery.views import pong, access_api_rules
 from views import help_text, say_help, END_HOOK_LIST, two_tokens
 
 
 rules = {'tec': {'rank': 'http://brasilico.pythonanywhere.com/_rank?words=',
-                 'filtra': 'http://brasilico.pythonanywhere.com/_filter_documents?afilter=',
-                 'capitulo': 'http://brasilico.pythonanywhere.com/_document_content/',
+                 'filtra':
+                  'http://brasilico.pythonanywhere.com/_filter_documents?afilter=',
+                 'capitulo':
+                  'http://brasilico.pythonanywhere.com/_document_content/',
                  '_message': 'Informe o comando: '
                 }
         }

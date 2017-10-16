@@ -8,6 +8,7 @@ from bottery.exceptions import ImproperlyConfigured
 
 logger = logging.getLogger('bottery.platforms')
 
+
 def discover_and_run_view(message):
     if message is None:
         return None
@@ -33,6 +34,7 @@ def discover_and_run_view(message):
 
     # raise Exception('No Pattern found!')
     return None
+
 
 def discover_view(message):
     base = os.getcwd()

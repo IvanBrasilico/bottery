@@ -1,4 +1,9 @@
+'''Classes that do the comparison of the User words
+ and a predefined pattern'''
+
+
 class Pattern:
+    '''Basic equal comparison'''
     def __init__(self, pattern, view):
         self.pattern = pattern
         self.view = view
@@ -10,13 +15,15 @@ class Pattern:
 
 
 class DefaultPattern:
+    '''Check always True'''
     def __init__(self, view):
         self.view = view
 
-    def check(self, message):
+    def check(self, message=None):
         # regarless the message, this pattern should return
         # the view, so, there is no checks to be made here
         return self.view
+
 
 class FuncPattern(Pattern):
     '''Receives a function to preprocess the incoming message
@@ -33,18 +40,19 @@ class FuncPattern(Pattern):
             return self.view
         return False
 
+
 class HookableFuncPattern(Pattern):
     '''Receives a function to preprocess the incoming message
     text before comparing it to the pattern.
     Allows use of regular expressions, selecting partial words for
     routing, etc
-    pre_process: a function to process message on check action before comparing
-    with pattern
+    pre_process: a function to process message on check action before
+     comparing with pattern
     context: string with history of messages
-    conversation: HookPattern Object that will hook any next messages to this pattern
-        (see ConversationPattern)'''
-    def __init__(self, pattern, view, pre_process, \
-                 hook_pattern=None, save_context=True, \
+    conversation: HookPattern Object that will hook any next messages
+     to this pattern (see ConversationPattern)'''
+    def __init__(self, pattern, view, pre_process,
+                 hook_pattern=None, save_context=True,
                  rules=None, params=None):
         self.pre_process = pre_process
         self.context = []
@@ -73,7 +81,7 @@ class HookableFuncPattern(Pattern):
 
     def check(self, message):
         '''Simple check'''
-        if (not self.conversation is None) and self.conversation.has_hook():
+        if (self.conversation is not None) and self.conversation.has_hook():
             return True
         text, _ = self.pre_process(message.text)
         if text == self.pattern:
@@ -86,7 +94,7 @@ class HookableFuncPattern(Pattern):
         First we see if the context has to be set, then we run the view.
         While view returns True, the hook will remain'''
         # If hooked, go directly to view
-        if (not self.conversation is None) and self.conversation.has_hook():
+        if (self.conversation is not None) and self.conversation.has_hook():
             if self.save_context:
                 self.context.append(message.text)
                 message.text = " ".join(self.context)
@@ -103,7 +111,8 @@ class HookableFuncPattern(Pattern):
                 try:
                     self.context = []
                     self.context.append(text)
-                    if (not self.conversation is None) and (not self.conversation.has_hook()):
+                    if (self.conversation is not None) and \
+                       (not self.conversation.has_hook()):
                         self.conversation.begin_hook(self)
                 except Exception as err:
                     print(err)
@@ -117,8 +126,8 @@ class HookPattern(Pattern):
     _pattern: a Hookable Pattern Object
     end_hook_words: a list of words that terminates the Hook
     Usage:
-    Put as first pattern
-    On a view, call set_conversation(Pattern) to ensure the next message will go to this Pattern
+    Put as first pattern. On a view, call set_conversation(Pattern)
+     to ensure the next message will go to this Pattern
     Also on a view, call end_conversation to release the hook'''
     def __init__(self, end_hook_words=None):
         self._pattern = None
@@ -129,8 +138,8 @@ class HookPattern(Pattern):
         '''Pass the calling away'''
         if self._pattern is None:
             return False
-        
-        if not self._end_hook_words is None:
+
+        if self._end_hook_words is not None:
             for word in message.text.split(' '):
                 if word in self._end_hook_words:
                     self.end_hook()

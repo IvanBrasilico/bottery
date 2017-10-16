@@ -5,7 +5,7 @@ import requests
 
 from bottery import platform
 from bottery.message import Message
-from bottery.platform import discover_view, discover_and_run_view
+from bottery.platform import discover_and_run_view
 from bottery.user import User
 
 logger = logging.getLogger('bottery.telegram')
