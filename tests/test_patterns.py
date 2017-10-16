@@ -1,5 +1,5 @@
-from bottery.conf.patterns import DefaultPattern, Pattern, \
-    HookableFuncPattern, HookPattern
+from bottery.conf.patterns import (DefaultPattern, HookableFuncPattern,
+                                   HookPattern, Pattern)
 
 
 def test_pattern_instance():

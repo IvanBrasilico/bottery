@@ -1,7 +1,8 @@
 '''Unit Tests for the views inside bottery.views'''
 from unittest import mock
-from bottery.views import pong, locate_next, \
-    process_parameters, access_api_rules
+
+from bottery.views import (access_api_rules, locate_next, pong,
+                           process_parameters)
 
 RULES = {'book':
          {'list': '/list',
