@@ -1,14 +1,20 @@
 import pytest
 
-from bottery.platform import BasePlatform
+from bottery.platform import BaseEngine
 
 
-def test_platform_baseplatform():
-    platform = 'TEST_PLATFORM'
-    bp = BasePlatform(platform=platform)
+@pytest.mark.parametrize('attr', ['platform', 'tasks'])
+def test_baseengine_attrs(attr):
+    """Check if attributes from the public API raise NotImplementedError"""
+    engine = BaseEngine()
+    with pytest.raises(NotImplementedError):
+        getattr(engine, attr)
 
-    assert bp.webhook_endpoint == '/hook/{}'.format(platform)
-    assert not len(bp.tasks)
 
-    with pytest.raises(Exception):
-        bp.build_message()
+@pytest.mark.parametrize('method_name', ['build_message', 'configure'])
+def test_baseengine_calls(method_name):
+    """Check if method calls from public API raise NotImplementedError"""
+    engine = BaseEngine()
+    with pytest.raises(NotImplementedError):
+        method = getattr(engine, method_name)
+        method()
