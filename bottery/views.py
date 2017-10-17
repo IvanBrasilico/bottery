@@ -107,6 +107,7 @@ def access_api_rules(message, rules, params_dict=None):
         str_params = str_params[:-1]  # Take off last '&'
 
     url = url + str_params
+    print(url)
     response_text = urlopen(url).read()
     try:
         resposta = response_text.decode('utf-8')
@@ -114,13 +115,20 @@ def access_api_rules(message, rules, params_dict=None):
         resposta = response_text
     json_resposta = json.loads(resposta)
     str_resposta = ""
-    print(json_resposta)
+    # print(json_resposta)
     if isinstance(json_resposta, list):
         for linha in json_resposta:
-            for key, value in linha.items():
-                str_resposta = str_resposta + key + ': ' + str(value) + ' \n '
-    else:
+            if isinstance(linha, dict):
+                for key, value in linha.items():
+                    str_resposta = str_resposta + \
+                        key + ': ' + str(value) + ' \n '
+            elif isinstance(linha, str):
+                str_resposta = json_resposta
+
+    elif isinstance(json_resposta, dict):
         for key, value in json_resposta.items():
             str_resposta = str_resposta + key + ': ' + str(value) + ' \n '
+    elif isinstance(json_resposta, str):
+        str_resposta = json_resposta
 
     return str_resposta, False
