@@ -117,11 +117,11 @@ def access_api_rules(message, rules, params_dict=None):
     # print(json_resposta)
     if isinstance(json_resposta, list):
         for linha in json_resposta:
-            if isinstance(json_resposta, dict):
+            if isinstance(linha, dict):
                 for key, value in linha.items():
                     str_resposta = str_resposta + \
                         key + ': ' + str(value) + ' \n '
-            elif isinstance(json_resposta, str):
+            elif isinstance(linha, str):
                 str_resposta = json_resposta
 
     elif isinstance(json_resposta, dict):
